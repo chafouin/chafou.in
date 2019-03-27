@@ -17,21 +17,18 @@
     
     
 
-<title> • Chafouin</title>
+<title>KVM &amp; Dynamic DNS: dynamic virtual machine naming • Chafouin</title>
 
 
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content=""/>
-<meta name="twitter:description" content="kvm-ddns
-title: &ldquo;KVM &amp; Dynamic DNS: dynamic virtual machine naming&rdquo; date: 2017-06-10T15:32:15&#43;03:00
-draft: false In my previous article, we saw how to provision KVM virtual machine with PXE. We have our own virtual machine deployment lab in our own laptop. And that&rsquo;s great. Each time we create a virtual machine, we need to connect with Spice in order to get the private IP or use tool like nmap or check the ARP cache."/>
+<meta name="twitter:title" content="KVM &amp; Dynamic DNS: dynamic virtual machine naming"/>
+<meta name="twitter:description" content="In my previous article, we saw how to provision KVM virtual machine with PXE. We have our own virtual machine deployment lab in our own laptop. And that&rsquo;s great. Each time we create a virtual machine, we need to connect with Spice in order to get the private IP or use tool like nmap or check the ARP cache. If you need to deploy a lot of virtual machine, this will become a real hassle."/>
 
-<meta property="og:title" content="" />
-<meta property="og:description" content="kvm-ddns
-title: &ldquo;KVM &amp; Dynamic DNS: dynamic virtual machine naming&rdquo; date: 2017-06-10T15:32:15&#43;03:00
-draft: false In my previous article, we saw how to provision KVM virtual machine with PXE. We have our own virtual machine deployment lab in our own laptop. And that&rsquo;s great. Each time we create a virtual machine, we need to connect with Spice in order to get the private IP or use tool like nmap or check the ARP cache." />
+<meta property="og:title" content="KVM &amp; Dynamic DNS: dynamic virtual machine naming" />
+<meta property="og:description" content="In my previous article, we saw how to provision KVM virtual machine with PXE. We have our own virtual machine deployment lab in our own laptop. And that&rsquo;s great. Each time we create a virtual machine, we need to connect with Spice in order to get the private IP or use tool like nmap or check the ARP cache. If you need to deploy a lot of virtual machine, this will become a real hassle." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://chafou.in/posts/kvm-ddns/" />
+<meta property="og:url" content="https://chafou.in/posts/kvm-ddns/" /><meta property="article:published_time" content="2017-06-10T15:32:15&#43;03:00"/>
+<meta property="article:modified_time" content="2017-06-10T15:32:15&#43;03:00"/>
 
     
 
@@ -151,11 +148,13 @@ draft: false In my previous article, we saw how to provision KVM virtual machine
             
     <article>
   <header>
-    <h1></h1>
+    <h1>KVM &amp; Dynamic DNS: dynamic virtual machine naming</h1>
     
     
 <div class="post__meta">
     
+    
+      <i class="fas fa-calendar-alt"></i> 10/06/2017
     
     
     
@@ -170,18 +169,7 @@ draft: false In my previous article, we saw how to provision KVM virtual machine
   
   
   <div class="post">
-    
-
-<p>kvm-ddns</p>
-
-<hr />
-
-<p>title: &ldquo;KVM &amp; Dynamic DNS: dynamic virtual machine naming&rdquo;
-date: 2017-06-10T15:32:15+03:00</p>
-
-<h2 id="draft-false">draft: false</h2>
-
-<p>In my previous article, we saw how to provision KVM virtual machine with PXE. We have our own virtual machine deployment lab in our own laptop. And that&rsquo;s great. Each time we create a virtual machine, we need to connect with Spice in order to get the private IP or use tool like nmap or check the ARP cache. If you need to deploy a lot of virtual machine, this will become a real hassle.</p>
+    <p>In my previous article, we saw how to provision KVM virtual machine with PXE. We have our own virtual machine deployment lab in our own laptop. And that&rsquo;s great. Each time we create a virtual machine, we need to connect with Spice in order to get the private IP or use tool like nmap or check the ARP cache. If you need to deploy a lot of virtual machine, this will become a real hassle.</p>
 
 <p>In this article, I will present you another solution for this problem : the dynamic DNS. We will install a DNS server on our hypervisor (here a laptop). This DNS server will register each virtual machine when it joins the network. Then, the virtual machine will get its hostname from the same DNS server. So you can decide what will be the machine name beforehand then deploy it and use this name to connect to it easily.</p>
 
@@ -391,12 +379,12 @@ subnet 10.250.12.0 netmask 255.255.255.0 {
     
     <a href="/posts/kvm-pxe/" class="navigation-prev">
       <i aria-hidden="true" class="fa fa-chevron-left"></i>
-      <span class="navigation-tittle"></span>
+      <span class="navigation-tittle">KVM &amp; PXE: virtual machine setup automation</span>
     </a>
     
     
-    <a href="/posts/kafka-cloudwatch-consumer-lag/" class="navigation-next">
-      <span class="navigation-tittle"></span>
+    <a href="/posts/aws-asg-ddns/" class="navigation-next">
+      <span class="navigation-tittle">AWS AutoScaling Group &amp; dynamic Route53 records</span>
       <i aria-hidden="true" class="fa fa-chevron-right"></i>
     </a>
     
