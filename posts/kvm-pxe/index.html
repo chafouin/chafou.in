@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.48" />
+
+    
+    
+    
+
+<title> • Chafouin</title>
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="kvm-pxe
+title: &ldquo;KVM &amp; PXE: virtual machine setup automation&rdquo; date: 2016-10-27T19:55:05&#43;03:00
+draft: false What is virtualization ? Since the 1960s and mainframe computers, computer scientists have made huge progress on virtualization. However until late 1990s, this was out of fashion. Popek and Goldberg defined it as &ldquo;an efficient and isolated duplicate of a real machine&rdquo;. Nowadays, even if some are still reluctant to the idea, virtual machines are present everywhere in the IT world."/>
+
+<meta property="og:title" content="" />
+<meta property="og:description" content="kvm-pxe
+title: &ldquo;KVM &amp; PXE: virtual machine setup automation&rdquo; date: 2016-10-27T19:55:05&#43;03:00
+draft: false What is virtualization ? Since the 1960s and mainframe computers, computer scientists have made huge progress on virtualization. However until late 1990s, this was out of fashion. Popek and Goldberg defined it as &ldquo;an efficient and isolated duplicate of a real machine&rdquo;. Nowadays, even if some are still reluctant to the idea, virtual machines are present everywhere in the IT world." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://chafou.in/posts/kvm-pxe/" />
+
+    
+
+
+
+<link rel="stylesheet" href="/css/github.css">
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.9181f25ed2263aeb878ec6f8a84f10c4ebb16150000fca8767308880bdde5ca0.css" integrity="sha256-kYHyXtImOuuHjsb4qE8QxOuxYVAAD8qHZzCIgL3eXKA=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://chafou.in/">Chafouin</a>
+      </span>
+      
+        
+        
+        
+        <div class="author-image">
+          <img src="https://chafou.in//img/logo.png" alt="Author Image" class="img--circle img--headshot element--center">
+        </div>
+        
+      
+      
+      <p class="site__description">
+          Cloud monkey Automation junky Fabulous SRE 
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Chafouin</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		 
+			 
+				<li>
+					<a href="/">
+						<span>Home</span>
+					</a>
+				</li>
+			 
+		 
+			 
+				<li>
+					<a href="/about/">
+						<span>About</span>
+					</a>
+				</li>
+			 
+		
+		</li>
+	</ul>
+</div>
+
+        <section class="social">
+	
+	
+	
+	<a href="https://github.com/chafouin" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/charpe-v" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	<a href="mailto:vincent@chafou.in" rel="me"><i class="fas fa-at fa-lg" aria-hidden="true"></i></a>
+	
+</section>
+
+      </div>
+    </div>
+    
+<div class="copyright">
+  &copy; 2019 chafouin
+  
+    <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>
+  
+</div>
+
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    <article>
+  <header>
+    <h1></h1>
+    
+    
+<div class="post__meta">
+    
+    
+    
+    
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 18 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    
+
+<p>kvm-pxe</p>
+
+<hr />
+
+<p>title: &ldquo;KVM &amp; PXE: virtual machine setup automation&rdquo;
+date: 2016-10-27T19:55:05+03:00</p>
+
+<h2 id="draft-false">draft: false</h2>
+
+<h4 id="what-is-virtualization">What is virtualization ?</h4>
+
+<p>Since the 1960s and mainframe computers, computer scientists have made huge
+progress on virtualization. However until late 1990s, this was out of fashion.
+Popek and Goldberg defined it as &ldquo;an efficient and isolated duplicate of a real
+machine&rdquo;. Nowadays, even if some are still reluctant to the idea, virtual
+machines are present everywhere in the IT world. Their purposes are various:
+development environment, production isolation, testing bed, etc. A lot of
+people and company are using them on daily basis. In some infrastructures,
+administrators are using hypervisors, operating system that are made specially
+to run virtual machine on it. We could discuss if it is a good or a bad to
+virtualize everything but this is not the subject here. A lot of software
+solutions are available to create virtual machines, all using different
+technologies and way of emulate computers: some very professional like VMWare,
+some more general public like VirtualBox, some generate a lot of hype like
+Docker. One of my favorite is KVM.</p>
+
+<h4 id="what-is-kvm">What is KVM ?</h4>
+
+<p>KVM stands for Kernel-based Virtual Machine, it is a software that turns a
+Linux kernel into an hypervisor and rely on QEMU to perform the hardware
+virtualization. We will use it to create and run our virtual machines. In
+order to easily manage our virtual machine, we will use Virt-Manager. That
+tool will provides us a GUI to interact with KVM, locally or remotely. We will
+use another too call Virsh too, which is a similar tool but with a CLI. These
+tools need to be interfaced with KVM: Lib-virt will handle that.
+It is a virtualization API used to provide interfaces with various
+virtualization solutions, including KVM.</p>
+
+<p>This proof of concept will be setup on Debian 9. It should be faily easy to
+adapt it to recent Ubuntu version.</p>
+
+<h4 id="goal">Goal</h4>
+
+<p>The purpose of this article is simple: find a way to create a virtual machine
+from scratch easily and automate the installation process. In my personal
+workflow, I create and trash a lot of Virtual Machine to test different
+deployments on my personal computer. It is very cumbersome to constantly create
+and setup a virtual machine. A solution to spend less time doing this could be
+to clone the virtual machine once setup at a blank state and start from there.
+But I thought of another solution, not very ideal but that could be interesting
+to test.</p>
+
+<h4 id="solution">Solution</h4>
+
+<p>We will use KVM with Virt-Manager in order to create and manage our virtual
+machine. We will setup our network with a bridge to make it appear to other
+computers on your local network like a physical machine. Then we will setup a
+PXE boot with TFTP and Preseed to automate the operating system installation.
+Our objective will be to automate the setup of a Debian Jessie x64. This is an
+arbitrary choosen systems, you can adapt the PXE configuration to any operating
+systems but the installation automation rely on Preseed, which is only
+available on Debian, so you need to find a similar software for your system if
+you don&rsquo;t use Debian-like system.</p>
+
+<h4 id="requirements">Requirements</h4>
+
+<p>First, let&rsquo;s check if our processor is compatible.</p>
+
+<pre><code class="language-bash">egrep '^flags.*(vmx|svm)' /proc/cpuinfo
+</code></pre>
+
+<p>/proc/cpuinfo is a file used to describe the current processor. It contains a
+lot of useful informations. One of them is flags: this field contains
+abreviations that describe available processor features. Your processor needs
+to have smx or vmx if you want to use KVM. Simply because smx is a flag for AMD
+virtualization extention and vmx for Intel virtualization extension:
+if you don&rsquo;t have one of those extentions, your processor is not capable to
+handle virtualization. If you have a recent cpu, it should not be an issue.</p>
+
+<p>So if nothing is printed, your processor is not compactible. If you have
+something similar to this, you can continue:</p>
+
+<pre><code>flags : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm arch_perfmon pebs bts nopl xtopology aperfmperf eagerfpu pni pclmulqdq dtes64 monitor vmx
+</code></pre>
+
+<h4 id="install-kvm">Install KVM</h4>
+
+<p>If you met the previous requirements we should proceed and install KVM. Use
+your favourite package manager to install the following packages:</p>
+
+<pre><code class="language-bash">sudo apt-get install kvm qemu-kvm libvirt-bin virtinst virt-manager
+</code></pre>
+
+<p>Now we need to add our current user to the libvirtd group.</p>
+
+<pre><code class="language-bash">sudo usermod -a -G libvirtd $USER
+</code></pre>
+
+<p>If everything is alright, you can use KVM by now. Let&rsquo;s try a simple command
+that will list every virtual machine you have created with Virsh. Since you
+have not create any, the list should empty. If there is no error, you can go
+on.</p>
+
+<pre><code class="language-bash">virsh -c qemu:///system list
+</code></pre>
+
+<p>The point of this article is not to show you how to use KVM or virt-manager,
+you can find a lot of ressources by browsing on the Internet or simply reading
+the <a href="https://www.linux-kvm.org/page/Documents">documention</a>.</p>
+
+<h4 id="setup-kvm-network-bridge">Setup KVM network bridge</h4>
+
+<p>Before setting up the PXE, we need to change our network. By default, the
+virtual machine networking is set to NAT. Like your computer behind your
+Internet gateway, the virtual machine will be hidden behind the host IP to
+communicate with external network, and PXE cannot work in such configuration.
+That&rsquo;s why we will configure our network card as bridge.</p>
+
+<p>Some of the following commands will configure the eth0 interface, you can
+change eth0 by wlan0 if you use your Wifi interface to connect to your local
+network.</p>
+
+<p>Open /etc/network/interfaces and make that changes :</p>
+
+<pre><code>auto lo
+iface lo inet loopback
+
+auto wlan0
+iface wlan0 inet manual
+
+auto eth0
+iface eth0 inet manual
+
+auto br0
+iface br0 inet static
+  bridge_ports eth0
+  address 10.250.12.254
+  netmask 255.255.255.0
+  broadcast 10.250.12.255
+  bridge_stp off
+  bridge_fd 0
+  bridge_maxwait 0
+</code></pre>
+
+<p>Then reload your networking service.</p>
+
+<pre><code class="language-bash">sudo systemctl restart networking
+</code></pre>
+
+<p>Now your virtual machines can use that bridge in order to be connected but they
+cannot connect to the Internet. You will need to allow package forwarding and
+enable masquerading. First, run this command:</p>
+
+<pre><code class="language-bash">sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+</code></pre>
+
+<p>Then add the following line in /etc/sysctl.conf:</p>
+
+<pre><code>net.ipv4.conf.all.forwarding = 1
+</code></pre>
+
+<p>And reload it:</p>
+
+<pre><code class="language-bash">sysctl -p
+</code></pre>
+
+<p>You are now all set with KVM. Shall we continue ?</p>
+
+<h4 id="preboot-execution-environment">Preboot eXecution Environment</h4>
+
+<p>Now, you can manually create your virtual machine, mount an operating system
+ISO and install it. By the end of this installation, your virtual machine will
+appear as a physical host for other computers. But we don&rsquo;t want to do it that
+way, we don&rsquo;t want to have to choose the ISO every time we want to create a new
+virtual machine and go through each installation step manually. We need
+automation.</p>
+
+<p>So let&rsquo;s setup PXE to provide our virtual machine some netinstall images.
+PXE boot, or Pre-boot eXecution Environment, is an environment where the
+machine boots and downloads an operating system image from the network,
+so you don&rsquo;t need to mount an ISO.</p>
+
+<p>Before starting to write the PXE configuration, we need to setup the DHCP and
+the TFTP server. The first tool will provides dynamic IP for our virtual
+machines and tell them where to find the netinstall images and the second will
+give them access to these files. An HTTP server can be used instead of TFTP.</p>
+
+<h4 id="setup-dhcp-server">Setup DHCP server</h4>
+
+<p>You can install this dhcp server using your package manager.</p>
+
+<pre><code class="language-bash">sudo apt-get install isc-dhcp-server
+</code></pre>
+
+<p>Then edit the file /etc/dhcp/dhcpd.conf.</p>
+
+<pre><code>option domain-name &quot;chafouin.org&quot;;
+option domain-name-servers 8.8.8.8, 8.8.4.4;
+
+default-lease-time 600;
+max-lease-time 7200;
+server-name &quot;dhcp-server&quot;;
+
+ddns-update-style none;
+
+authoritative;
+
+allow bootp;
+allow booting;
+
+subnet 10.250.12.0 netmask 255.255.255.0 {
+  range 10.250.12.100 10.250.12.200;
+  option subnet-mask 255.255.255.0;
+  option broadcast-address 10.250.12.255;
+  option routers 10.250.12.254;
+  ping-check = 1;
+  filename &quot;pxelinux.0&quot;;
+  next-server 10.250.12.254;
+}
+</code></pre>
+
+<p>Our DHCP will provides network configurations to our virtual machines on our
+bridge. As you can see, I chose the ip range from 10.250.12.100 to
+10.250.12.200 for our virtual machine, it should be enough. Our host is on
+10.250.12.254 and will be our gateway. The &lsquo;next-server&rsquo; field contains the
+TFTP server address and the <code>filename &quot;pxelinux.0&quot;</code> option will tell to the
+client to look for this file in order to boot on the PXE, we will see that
+later.</p>
+
+<h4 id="setup-tftp-server">Setup TFTP server</h4>
+
+<p>As I said before. we need to install a TFTP server. It will provides the
+netinstall files to our machines. As usual, use your favourite package manager.</p>
+
+<pre><code class="language-bash">sudo apt-get install tftpd-hpa
+</code></pre>
+
+<p>Then edit the /etc/default/tftpd-hpa to add these changes:</p>
+
+<pre><code># /etc/default/tftpd-hpa
+
+TFTP_USERNAME=&quot;root&quot;
+TFTP_DIRECTORY=&quot;/srv/tftp&quot;
+TFTP_ADDRESS=&quot;0.0.0.0:69&quot;
+TFTP_OPTIONS=&quot;--secure&quot;
+</code></pre>
+
+<p>The TFTP server is now ready to serve the image. We just need to prepare the
+path. Now you can get your netinstall files from your favourite distro official
+website or create a custom one. In our example, let&rsquo;s get the Debian
+netinstall.</p>
+
+<p>We should create some new folders where we will store our PXE configurations
+files and operating system images.</p>
+
+<pre><code class="language-bash">mkdir -p /srv/tftp/config/bootscreens /srv/tftp/config/debian /srv/tftp/installers/debian/jessie/amd64
+</code></pre>
+
+<p>Get the Debian netboot install from the official server and extract the files
+in our TFTP directory.</p>
+
+<pre><code class="language-bash">curl -O http://ftp.debian.org/debian/dists/jessie/main/installer-amd64/current/images/netboot/netboot.tar.gz
+tar xvf netboot.tar.gz
+mv debian-installer/amd64/pxelinux.0 /srv/tftp/pxelinux.0
+mv debian-installer/amd64/pxelinux.cfg /srv/tftp
+mv debian-installer/amd64/boot-screens/vesamenu.c32 /srv/tftp
+mv debian-installer/amd64/initrd.gz debian-installer/amd64/linux /srv/tftp/installers/debian/jessie/amd64
+</code></pre>
+
+<p>We have our installer setup, now we can start to create our configuration.</p>
+
+<p>Open a new file called <strong>/srv/tftp/pxelinux.cfg/default</strong> and paste the
+following content.</p>
+
+<pre><code>default vesamenu.c32
+
+menu title PXE installer menu
+menu background config/splash.png
+
+menu hshift 0
+menu vshift 7
+menu width 50
+menu margin 0
+
+# Colors
+menu color title  * #FFFFFFFF *
+menu color border * #00000000 #00000000 none
+menu color sel    * #ffffffff #76a1d0ff *
+menu color hotsel 1;7;37;40 #ffffffff #76a1d0ff *
+menu color tabmsg * #ffffffff #00000000 *
+menu color help   37;40 #ffdddd00 #00000000 none
+
+# Text position
+menu helpmsgrow 15
+menu cmdlinerow 16
+#menu timeoutrow 16
+menu tabmsgrow 14
+menu tabmsg Choose the OS you want install
+# No prompt, no timeout
+prompt 0
+timeout 100
+
+# Deactivate escape keyboard and disallow options
+noescape 1
+allowoptions 0
+
+include config/menu.cfg
+</code></pre>
+
+<p>This file contains PXE menus general parameters, read the coments to
+understand what it does. Then we need to describe our first menu.</p>
+
+<p>Create the file <strong>/srv/tftp/config/menu.cfg</strong></p>
+
+<pre><code>label local
+    menu label Boot on local drive
+    menu default
+    localboot 0
+menu begin debian
+    menu title ^Debian Install
+    include config/debian/menu.cfg
+menu end
+</code></pre>
+
+<p>This file will define the menu displayed when you will start the PXE boot that
+will be used to select the operating system you want to install.</p>
+
+<p>This first part with &lsquo;label local&rsquo; will display an option to start the virtual
+machine directly on its attached hard drive. This option could be useful if you
+start a virtual machine that already have been installed.</p>
+
+<p>The second part with &lsquo;menu begin debian&rsquo; will display an option to open the
+Debian submenu, since we are trying to build something modular. This submenu
+will be descibe below. We will make only one configuration for Debian Jessie
+x64 but you can duplicate this configuration and customize it in order to build
+your own Debian version with x86, Wheezy or anything else.</p>
+
+<p>Let&rsquo;s write the second menu. It will contains the kernel files path and kernel
+command line options that PXE will load on our virtual machine. Finally open
+the file <strong>/srv/tftp/config/debian/menu.cfg</strong>.</p>
+
+<pre><code>label install
+    menu label Debian Jessie ^64 bits
+    kernel installers/debian/jessie/amd64/linux
+    append vga=normal initrd=installers/debian/jessie/amd64/initrd.gz url=tftp://10.250.12.254/config/debian/./debian-jessie-preseed.cfg auto=true priority=critical interface=eth0
+label separator
+    menu label -----
+label mainmenu
+    menu label ^Back..
+    menu exit
+</code></pre>
+
+<p>Here some explanations:</p>
+
+<ul>
+<li>kernel : path to the kernel images</li>
+<li>append : add options to the kernel command line</li>
+</ul>
+
+<p>Append command explanations:</p>
+
+<ul>
+<li>vga=normal : select the normal display mode on boot</li>
+<li>initrd=installers/debian/jessie/amd64/initrd.gz : path to the initrd file</li>
+<li>url=tftp://10.250.12.254/config/debian/./debian-jessie-preseed.cfg : url to a preconfiguration file to download</li>
+<li>auto=true : start auto installer</li>
+<li>priority=critical : stop any low priority questions from being asked</li>
+<li>interface=eth0 : network interface setup before installation</li>
+</ul>
+
+<h3 id="preseed">Preseed</h3>
+
+<p>By now you should be capable to start create and start your virtual machine
+with virt-manager or virsh, navigate on the PXE interface, choose an operating
+system then install it manually. That&rsquo;s great but not enought. We need a last
+step. We need more automation. Why? Because it saves your time and your money,
+reduces misconfiguration problems and it is less cumbersome. Here, we got 2
+solutions to fix these issues: automate installation or clone already installed
+machine. We won&rsquo;t use the cloning method. We will use Preseed, it will provides
+the installation automation we need here. Preseed is only available on Debian
+but you can find similar software for your OS, like Kickstart for CentOS or
+Remote Installation Service for Windows.</p>
+
+<p>Let&rsquo;s start to talk about the Preseed. this is a file used by the netboot
+installer in order to load the installation configuration. With that, no more
+user input is needed and the installation will be fully automated.</p>
+
+<p>Let&rsquo;s create a new file in /srv/tftp/config/debian/debian-jessie-preseed.cfg.</p>
+
+<pre><code>#### Contents of the preconfiguration file (for Debian Jessie)
+### Localization
+# Preseeding only locale sets language, country and locale.
+d-i debian-installer/language string en
+d-i debian-installer/country string FR
+d-i debian-installer/locale string en_US.UTF-8
+
+# Keyboard selection.
+d-i keyboard-configuration/xkb-keymap select us
+
+### Network configuration
+# netcfg will pick eth0 as interface.
+d-i netcfg/choose_interface select eth0
+
+# Any hostname and domain names assigned from dhcp take precedence over
+# values set here. However, setting the values still prevents the questions
+# from being shown, even if values come from dhcp.
+d-i netcfg/get_hostname string unassigned-hostname
+d-i netcfg/get_domain string unassigned-domain
+
+### Mirror settings
+# If you select ftp, the mirror/country string does not need to be set.
+#d-i mirror/protocol string ftp
+d-i mirror/country string manual
+d-i mirror/http/hostname string ftp.fr.debian.org
+d-i mirror/http/directory string /debian
+d-i mirror/http/proxy string
+
+# Suite to install.
+#d-i mirror/suite string testing
+# Suite to use for loading installer components (optional).
+#d-i mirror/udeb/suite string testing
+
+### Account setup
+# Skip creation of a root account (normal user account will be able to
+# use sudo).
+#d-i passwd/root-login boolean false
+# Alternatively, to skip creation of a normal user account.
+d-i passwd/make-user boolean false
+
+# Root password, either in clear text
+d-i passwd/root-password password toor
+d-i passwd/root-password-again password toor
+# or encrypted using an MD5 hash.
+#d-i passwd/root-password-crypted password 5a3498520d8994fab848bf76299127b9
+
+### Clock and time zone setup
+# Controls whether or not the hardware clock is set to UTC.
+d-i clock-setup/utc boolean true
+
+# You may set this to any valid setting for $TZ; see the contents of
+# /usr/share/zoneinfo/ for valid values.
+d-i time/zone string Europe/Paris
+
+# Controls whether to use NTP to set the clock during the install
+d-i clock-setup/ntp boolean true
+# NTP server to use. The default is almost always fine here.
+d-i clock-setup/ntp-server string pool.ntp.org
+
+### Partitioning
+d-i partman-auto/method string lvm
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-md/device_remove_md boolean true
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+d-i partman-auto/choose_recipe select atomic
+
+# This makes partman automatically partition without confirmation, provided
+# that you told it what to do using one of the methods above.
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+# This makes partman automatically partition without confirmation.
+d-i partman-md/confirm boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+## Controlling how partitions are mounted
+# The default is to mount by UUID, but you can also choose &quot;traditional&quot; to
+# use traditional device names, or &quot;label&quot; to try filesystem labels before
+# falling back to UUIDs.
+#d-i partman/mount_style select uuid
+
+### Base system installation
+# Configure APT to not install recommended packages by default. Use of this
+# option can result in an incomplete system and should only be used by very
+# experienced users.
+d-i base-installer/install-recommends boolean false
+
+### Apt setup
+# You can choose to install non-free and contrib software.
+d-i apt-setup/non-free boolean true
+d-i apt-setup/contrib boolean true
+d-i apt-setup/use_mirror boolean false
+d-i apt-setup/services-select multiselect security, updates
+d-i apt-setup/security_host string security.debian.org
+
+### Package selection
+tasksel tasksel/first multiselect minimal
+
+# Individual additional packages to install
+d-i pkgsel/include string openssh-server build-essential curl
+# Whether to upgrade packages after debootstrap.
+# Allowed values: none, safe-upgrade, full-upgrade
+d-i pkgsel/upgrade select full-upgrade
+
+# Some versions of the installer can report back on what software you have
+# installed, and what software you use. The default is not to report back,
+# but sending reports helps the project determine what software is most
+# popular and include it on CDs.
+popularity-contest popularity-contest/participate boolean false
+
+### Boot loader installation
+# Grub is the default boot loader (for x86). If you want lilo installed
+# instead, uncomment this:
+#d-i grub-installer/skip boolean true
+# To also skip installing lilo, and install no bootloader, uncomment this
+# too:
+#d-i lilo-installer/skip boolean true
+
+
+# This is fairly safe to set, it makes grub install automatically to the MBR
+# if no other operating system is detected on the machine.
+d-i grub-installer/only_debian boolean true
+
+# This one makes grub-installer install to the MBR if it also finds some other
+# OS, which is less safe as it might not be able to boot that other OS.
+d-i grub-installer/with_other_os boolean true
+
+# Due notably to potential USB sticks, the location of the MBR can not be
+# determined safely in general, so this needs to be specified:
+d-i grub-installer/bootdev  string /dev/vda
+
+# Avoid that last message about the install being complete.
+d-i finish-install/reboot_in_progress note
+
+# This will prevent the installer from ejecting the CD during the reboot,
+# which is useful in some situations.
+d-i cdrom-detect/eject boolean false
+
+# This will power off the machine instead of just halting it.
+d-i debian-installer/exit/poweroff boolean true
+
+#### Advanced options
+### Running custom commands during the installation
+# d-i preseeding is inherently not secure. Nothing in the installer checks
+# for attempts at buffer overflows or other exploits of the values of a
+# preconfiguration file like this one. Only use preconfiguration files from
+# trusted locations! To drive that home, and because it's generally useful,
+# here's a way to run any shell command you'd like inside the installer,
+# automatically.
+
+# This first command is run as early as possible, just after
+# preseeding is read.
+#d-i preseed/early_command string anna-install some-udeb
+# This command is run immediately before the partitioner starts. It may be
+# useful to apply dynamic partitioner preseeding that depends on the state
+# of the disks (which may not be visible when preseed/early_command runs).
+#d-i partman/early_command \
+#       string debconf-set partman-auto/disk &quot;$(list-devices disk | head -n1)&quot;
+# This command is run just before the install finishes, but when there is
+# still a usable /target directory. You can chroot to /target and use it
+# directly, or use the apt-install and in-target commands to easily install
+# packages and run commands in the target system.
+d-i preseed/late_command string \
+in-target sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/g' /etc/ssh/sshd_config
+</code></pre>
+
+<p>Everything is already commented, I don&rsquo;t think you need more explanation.
+You should be able to create a new virtual machine and start it by now.</p>
+
+<p>Choose Debian Jessie x64 installation on the PXE menu and let the magic begin !
+No installation prompt anymore, installation screens follow the others without
+a single prompt waiting for you and everything run smoothly, that&rsquo;s perfect !
+Wait few minutes, your virtual machine will reboot and will be ready.</p>
+
+<p>In the end, your /srv/tftp tree should look like that :</p>
+
+<pre><code>.
+├── config
+│   ├── debian
+│   │   ├── debian-jessie-preseed.cfg
+│   │   └── menu.cfg
+│   └── menu.cfg
+├── installers
+│   └── debian
+│       └── jessie
+│           └── amd64
+│               ├── initrd.gz
+│               └── linux
+├── pxelinux.0
+├── pxelinux.cfg
+│   └── default
+└── vesamenu.c32
+</code></pre>
+
+<p>This tree is maybe not the state of the art but it is modular and simple,
+it allows us to organize efficiently our images. You can of course find a
+better way to organize these folders.</p>
+
+<p>You can face an issue where PXE will tell you that ldlinux.c32, libcom32.c32 or
+libutil.c32 cannot be load, you can fix it with this kind of command.</p>
+
+<pre><code class="language-bash">cp /usr/lib/syslinux/modules/bios/ldlinux.c32 /srv/tftp/
+cp /usr/lib/syslinux/modules/bios/libcom32.c32 /srv/tftp/
+cp /usr/lib/syslinux/modules/bios/libutil.c32 /srv/tftp/
+</code></pre>
+
+<p>These commands require syslinux, you can easily install it with :</p>
+
+<pre><code class="language-bash">apt-get install syslinux
+</code></pre>
+
+<h4 id="virsh-command-example">Virsh command example</h4>
+
+<p>Here is some virsh command I have dumped for you, you can use them to interact
+with the virtual machine.</p>
+
+<p>You can create a new storage with these commands:</p>
+
+<pre><code class="language-bash">virsh vol-create-as default /var/lib/libvirt/images/debian8_01.qcow2 10GiB --prealloc-metadata --format qcow2
+qemu-img create -f qcow2 -o preallocation=metadata /var/lib/libvirt/images/debian8_01.qcow2 10G
+</code></pre>
+
+<p>Then get a Debian minimal ISO:</p>
+
+<pre><code class="language-bash">curl -L http://cdimage.debian.org/debian-cd/8.6.0/amd64/iso-cd/debian-8.6.0-amd64-netinst.iso -o /var/lib/libvirt/images/debian-8.6.0-amd64-netinst.iso
+</code></pre>
+
+<p>And create a virtual machine with this one:</p>
+
+<pre><code class="language-bash">virt-install --connect qemu:///system --name debian8_01 --network=bridge:br0 --pxe --ram=2048 --vcpus=2 --check-cpu --os-type=linux --os-variant=generic --disk path=/var/lib/libvirt/images/debian8_01.qcow2 -c /var/lib/libvirt/images/debian-8.6.0-amd64-netinst.iso
+</code></pre>
+
+<p>Or you could create a new virtual machine using XML file, extracting the XML
+from an existing VM:</p>
+
+<pre><code class="language-bash">virsh dumpxml &lt;vm_name&gt; &gt; vm.xml
+virsh create vm.xml
+</code></pre>
+
+<p>Don&rsquo;t forget edit the XML to change the UUID and MAC address field.</p>
+
+<p>If you want to install the virtual machine manually and you don&rsquo;t want to use
+to virt-manager GUI, you can still use spice server:</p>
+
+<pre><code class="language-bash">spicec -h 127.0.0.1 -p 5900
+</code></pre>
+
+<p><code>Shift + f12</code> to go out of spice.</p>
+
+<p>Or to connect remotely with SSH, you could use this .ssh/config file.</p>
+
+<pre><code>Host vm
+  Hostname 10.250.12.100
+  User root
+  Port 1535
+  ForwardAgent yes
+  LocalForward 5900 localhost:5900
+</code></pre>
+
+<p>If you use an ISO CD, you can eject it after the installation with this:</p>
+
+<pre><code class="language-bash">virsh change-media vm hda --eject
+</code></pre>
+
+<h4 id="conclusion">Conclusion</h4>
+
+<p>This is the first conclusion of my first article on my first blog.
+What an achievement. Here is a summary of what you have learn:</p>
+
+<ul>
+<li>Install a complete KVM environement</li>
+<li>Setup a PXE boot</li>
+<li>Create a preseed file</li>
+</ul>
+
+<p>What&rsquo;s next you will ask. Check out those few references I put just below,
+these are very interesting things if you want to go understand better how KVM
+&amp; PXE works, maybe find another point of view or others explanations that are
+more clear for you. I based my article on these references and my actual
+knowledge, I hope these will help you too. See you next time.</p>
+
+<h1 id="references">References</h1>
+
+<p><a href="https://debian-administration.org/article/394/Automating_new_Debian_installations_with_preseeding">https://debian-administration.org/article/394/Automating_new_Debian_installations_with_preseeding</a></p>
+
+<p><a href="http://moss.csc.ncsu.edu/~mueller/cluster/arc/kvm_vm_creation.html">http://moss.csc.ncsu.edu/~mueller/cluster/arc/kvm_vm_creation.html</a></p>
+
+<p><a href="https://debian-administration.org/article/478/Setting_up_a_server_for_PXE_network_booting">https://debian-administration.org/article/478/Setting_up_a_server_for_PXE_network_booting</a></p>
+
+<p><a href="https://wiki.debian.org/PXEBootInstall">https://wiki.debian.org/PXEBootInstall</a></p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    
+    <a href="/posts/kvm-ddns/" class="navigation-next">
+      <span class="navigation-tittle"></span>
+      <i aria-hidden="true" class="fa fa-chevron-right"></i>
+    </a>
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+<script defer src="/js/fontawesome-5.6.3-all.min.js"></script>
+
+
+    
+    
+        <script src="/js/highlight.pack.js"></script>
+    
+    <script type="text/javascript">
+        
+        hljs.initHighlightingOnLoad();
+    </script>
+    
+
+
+
+
+    
+
+
+
+    </body>
+</html>

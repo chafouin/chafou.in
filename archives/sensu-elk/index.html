@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.48" />
+
+    
+    
+    
+
+<title>Monitoring: from Sensu to Elastic Stack • Chafouin</title>
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Monitoring: from Sensu to Elastic Stack"/>
+<meta name="twitter:description" content="Few months ago, I wrote an article for the company I work for about Sensu and how to collect metrics and forward them into ElasticSearch. This is only a PoC but I think it can be useful, at least to understand how to setup Sensu and Logstash and how Sensu checks and handlers work.
+Of course there is better metrics gathering solution like TICK stack and so on but if you already have Sensu client deploy on your infrastructure and you don&rsquo;t want to install another software like Collectd, Filebeat or Telegraf in order to send metrics into Graphana, InfluxDB or ElasticSearch."/>
+
+<meta property="og:title" content="Monitoring: from Sensu to Elastic Stack" />
+<meta property="og:description" content="Few months ago, I wrote an article for the company I work for about Sensu and how to collect metrics and forward them into ElasticSearch. This is only a PoC but I think it can be useful, at least to understand how to setup Sensu and Logstash and how Sensu checks and handlers work.
+Of course there is better metrics gathering solution like TICK stack and so on but if you already have Sensu client deploy on your infrastructure and you don&rsquo;t want to install another software like Collectd, Filebeat or Telegraf in order to send metrics into Graphana, InfluxDB or ElasticSearch." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://chafou.in/archives/sensu-elk/" /><meta property="article:published_time" content="2017-01-12T10:45:25&#43;03:00"/>
+<meta property="article:modified_time" content="2017-01-12T10:45:25&#43;03:00"/>
+
+    
+
+
+
+<link rel="stylesheet" href="/css/github.css">
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.9181f25ed2263aeb878ec6f8a84f10c4ebb16150000fca8767308880bdde5ca0.css" integrity="sha256-kYHyXtImOuuHjsb4qE8QxOuxYVAAD8qHZzCIgL3eXKA=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://chafou.in/">Chafouin</a>
+      </span>
+      
+        
+        
+        
+        <div class="author-image">
+          <img src="https://chafou.in//img/logo.png" alt="Author Image" class="img--circle img--headshot element--center">
+        </div>
+        
+      
+      
+      <p class="site__description">
+          Cloud monkey Automation junky Fabulous SRE 
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Chafouin</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		 
+			 
+				<li>
+					<a href="/">
+						<span>Home</span>
+					</a>
+				</li>
+			 
+		 
+			 
+				<li>
+					<a href="/about/">
+						<span>About</span>
+					</a>
+				</li>
+			 
+		
+		</li>
+	</ul>
+</div>
+
+        <section class="social">
+	
+	
+	
+	<a href="https://github.com/chafouin" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/charpe-v" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	<a href="mailto:vincent@chafou.in" rel="me"><i class="fas fa-at fa-lg" aria-hidden="true"></i></a>
+	
+</section>
+
+      </div>
+    </div>
+    
+<div class="copyright">
+  &copy; 2019 chafouin
+  
+    <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>
+  
+</div>
+
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    <article>
+  <header>
+    <h1>Monitoring: from Sensu to Elastic Stack</h1>
+    
+    
+<div class="post__meta">
+    
+    
+      <i class="fas fa-calendar-alt"></i> 12/01/2017
+    
+    
+    
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 1 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    <p>Few months ago, I wrote an article for the company I work for about Sensu and how to collect metrics and forward them into ElasticSearch. This is only a PoC but I think it can be useful, at least to understand how to setup Sensu and Logstash and how Sensu checks and handlers work.</p>
+
+<p>Of course there is better metrics gathering solution like TICK stack and so on but if you already have Sensu client deploy on your infrastructure and you don&rsquo;t want to install another software like Collectd, Filebeat or Telegraf in order to send metrics into Graphana, InfluxDB or ElasticSearch. I will show you a way to interface Sensu with ElasticSearch. But you can easily adapt Sensu if you want to send metrics to any metrics vizualisation software.</p>
+
+<p>You can read the whole article here: <a href="https://www.msolution.io/2015/12/02/how-to-send-your-sensu-events-to-elk-platform/">https://www.msolution.io/2015/12/02/how-to-send-your-sensu-events-to-elk-platform/</a></p>
+
+<p>Big up to MSolution.io !</p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+<script defer src="/js/fontawesome-5.6.3-all.min.js"></script>
+
+
+    
+    
+        <script src="/js/highlight.pack.js"></script>
+    
+    <script type="text/javascript">
+        
+        hljs.initHighlightingOnLoad();
+    </script>
+    
+
+
+
+
+    
+
+
+
+    </body>
+</html>

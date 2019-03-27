@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.48" />
+
+    
+    
+    
+
+<title> • Chafouin</title>
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="aws-asg-ddns
+title: &ldquo;AWS AutoScaling Group &amp; dynamic Route53 records&rdquo; date: 2018-05-14T11:32:20&#43;03:00
+draft: false Dynamic DNS for AWS AutoScaling Group AutoScaling group and Route53 record When you are deploying your application on AWS, you might want to use an AutoScaling Group to launch your EC2 instances. It groups logically the instance and has a lot of feature such as auto healing, scalability according to metrics, load balancer integration, etc. A good ptractice is to always run your instance in such group."/>
+
+<meta property="og:title" content="" />
+<meta property="og:description" content="aws-asg-ddns
+title: &ldquo;AWS AutoScaling Group &amp; dynamic Route53 records&rdquo; date: 2018-05-14T11:32:20&#43;03:00
+draft: false Dynamic DNS for AWS AutoScaling Group AutoScaling group and Route53 record When you are deploying your application on AWS, you might want to use an AutoScaling Group to launch your EC2 instances. It groups logically the instance and has a lot of feature such as auto healing, scalability according to metrics, load balancer integration, etc. A good ptractice is to always run your instance in such group." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://chafou.in/posts/aws-asg-ddns/" />
+
+    
+
+
+
+<link rel="stylesheet" href="/css/github.css">
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.9181f25ed2263aeb878ec6f8a84f10c4ebb16150000fca8767308880bdde5ca0.css" integrity="sha256-kYHyXtImOuuHjsb4qE8QxOuxYVAAD8qHZzCIgL3eXKA=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://chafou.in/">Chafouin</a>
+      </span>
+      
+        
+        
+        
+        <div class="author-image">
+          <img src="https://chafou.in//img/logo.png" alt="Author Image" class="img--circle img--headshot element--center">
+        </div>
+        
+      
+      
+      <p class="site__description">
+          Cloud monkey Automation junky Fabulous SRE 
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Chafouin</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		 
+			 
+				<li>
+					<a href="/">
+						<span>Home</span>
+					</a>
+				</li>
+			 
+		 
+			 
+				<li>
+					<a href="/about/">
+						<span>About</span>
+					</a>
+				</li>
+			 
+		
+		</li>
+	</ul>
+</div>
+
+        <section class="social">
+	
+	
+	
+	<a href="https://github.com/chafouin" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/charpe-v" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	<a href="mailto:vincent@chafou.in" rel="me"><i class="fas fa-at fa-lg" aria-hidden="true"></i></a>
+	
+</section>
+
+      </div>
+    </div>
+    
+<div class="copyright">
+  &copy; 2019 chafouin
+  
+    <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>
+  
+</div>
+
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    <article>
+  <header>
+    <h1></h1>
+    
+    
+<div class="post__meta">
+    
+    
+    
+    
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 4 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    
+
+<p>aws-asg-ddns</p>
+
+<hr />
+
+<p>title: &ldquo;AWS AutoScaling Group &amp; dynamic Route53 records&rdquo;
+date: 2018-05-14T11:32:20+03:00</p>
+
+<h2 id="draft-false">draft: false</h2>
+
+<h1 id="dynamic-dns-for-aws-autoscaling-group">Dynamic DNS for AWS AutoScaling Group</h1>
+
+<h2 id="autoscaling-group-and-route53-record">AutoScaling group and Route53 record</h2>
+
+<p>When you are deploying your application on <em>AWS</em>, you might want to use an
+<em>AutoScaling Group</em> to launch your <em>EC2 instances</em>. It groups logically the
+instance and has a lot of feature such as auto healing, scalability according
+to metrics, load balancer integration, etc. A good ptractice is to always run
+your instance in such group. Everything seems great with AutoScaling Group,
+except when you want to have a DNS record pointing on your instances.
+With a single EC2, it is possible to automatically add a <em>Route53 record</em>
+pointing to the instance with CloudFormation. But if you use an AutoScaling
+Group, AWS does not provide an automatic method to add each instance IP to a
+Route53 record. One well known workaround is to deploy an <em>Elastic Load
+Balancer</em> in front of the ASG and then add a alias record pointing to the ELB
+generated domain name. It works in most of the cases but sometimes you don&rsquo;t
+really need or want to have a load balancer in front if your instances.
+For instance if you deploy a Kafka cluster on an ASG, you don&rsquo;t want a load
+balancer because Kafka is designed to distribute traffic between brokers itself.
+n this blog post I will present a solution to solve this problem, using a
+<em>Lambda function</em>.</p>
+
+<h2 id="autoscaling-group-dynamic-dns-lambda-function">AutoScaling Group dynamic DNS Lambda function</h2>
+
+<p>The <em>AutoScaling Group</em> will be configured to send a notification to a <em>SNS topic</em>
+when an instance is created or terminated. A <em>Lambda function</em> called <em>awg_ddns</em>
+will be triggered by those notifications and will update the <em>Route53 record</em>
+accordingly. This Lambda function will query the Amazon EC2 API to get the IP of
+the instances in the AutoScaling Group then it will update the Route53 record.</p>
+
+<p>The code can be found on <a href="https://github.com/chafouin/aws-lambda-asg-ddns">GitHub</a>.</p>
+
+<h2 id="usage">Usage</h2>
+
+<p>To use this lambda function, you will first need to deploy an AutoScaling group
+on your AWS account and a hosted zone with the domain name you want. You will
+need to have Python 3, Terraform and the AWS CLI installed with an access key
+configured. Then you can run make command to package the function in a zip file
+and deploy the SNS topic and Lambda function the required IAM role. A prompt will
+appear asking for the domain name you want to assign to the instances and for the
+hosted zone id.</p>
+
+<pre><code>make
+</code></pre>
+
+<p>Then, get the SNS topic ARN and the AutoScaling group name, you can test that the
+function is working using the <em>test.sh</em> script.</p>
+
+<pre><code>./test.sh launch &lt;sns_topic_arn&gt; &lt;asg_name&gt;
+</code></pre>
+
+<p>Check the Route53 hosted zone, the DNS record should appear with the instance IP.
+You can run the previous command with <em>terminate</em> instead of <em>launch</em> to remove
+the DNS record.</p>
+
+<p>If the previous step is working, you can setup the AutoScaling group to send
+notification to the SNS topic on instance creation or termination. Once done,
+you can try to change the desired instance number of the ASG to check that
+the DNS record is being updated.</p>
+
+<h2 id="alternative-solution">Alternative solution</h2>
+
+<p>An alternative design can be to configure a CloudWatch Event to trigger the
+Lambda if CloudTrail is receiving a CreateInstance API call. Or the Lambda function can
+be triggered by a lifecycle hook set on the AutoScaling Group. Another alternative
+solution that works without having to deploy anything more than the ASG can be to put
+the Lambda code as a script inside each instances and call it in the user-data script
+when the instance is booting. But this solution does not work if we loose an instance
+unexpectedly since it is the instance that update the Route53 record. In this case your
+record will be in an inconsistent state until a new instance is launched. And it will
+require to give the instance the permission to change Route53 records, with the Lambda
+solution, only the lambda has this permission.</p>
+
+<p>At the end, all of those solutions are valid. I chose the one with Lambda and SNS but
+you might prefer one of the other, to each his own. I have been running this Lamdba
+every time I needed a dynamic DNS for an ASG for quite some time  now and it never let
+me down. I prefer this than using ELB, it cost more and adds a middleman so more complexity
+and potential point of failure, I don&rsquo;t think it is a good solution when you only want
+a domain name for your instances.</p>
+
+<p>If you have a better solution for this, don&rsquo;t hesitate to hit me up !
+You can open an issue on Github if you encounter one or even contribute
+with a Pull Request.</p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    <a href="/posts/go-html-template-css/" class="navigation-prev">
+      <i aria-hidden="true" class="fa fa-chevron-left"></i>
+      <span class="navigation-tittle"></span>
+    </a>
+    
+    
+    <a href="/posts/aws-asg-autoscaling-hook/" class="navigation-next">
+      <span class="navigation-tittle"></span>
+      <i aria-hidden="true" class="fa fa-chevron-right"></i>
+    </a>
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+<script defer src="/js/fontawesome-5.6.3-all.min.js"></script>
+
+
+    
+    
+        <script src="/js/highlight.pack.js"></script>
+    
+    <script type="text/javascript">
+        
+        hljs.initHighlightingOnLoad();
+    </script>
+    
+
+
+
+
+    
+
+
+
+    </body>
+</html>

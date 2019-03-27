@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.48" />
+
+    
+    
+    
+
+<title> • Chafouin</title>
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="go-html-template-css
+title: &ldquo;Golang HTML template &amp; CSS variable&rdquo; date: 2018-08-03T22:41:56&#43;03:00
+draft: true There is numerous resource to find out how to use HTML templating in Golang on the Internet. However I encounter on particular issue that I could resolv myself. The probleme is simple: when templating an HTML file in Golang, how can we replace a given template variable by a string containing some CSS. You can try it for yourself with the following snippet."/>
+
+<meta property="og:title" content="" />
+<meta property="og:description" content="go-html-template-css
+title: &ldquo;Golang HTML template &amp; CSS variable&rdquo; date: 2018-08-03T22:41:56&#43;03:00
+draft: true There is numerous resource to find out how to use HTML templating in Golang on the Internet. However I encounter on particular issue that I could resolv myself. The probleme is simple: when templating an HTML file in Golang, how can we replace a given template variable by a string containing some CSS. You can try it for yourself with the following snippet." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://chafou.in/posts/go-html-template-css/" />
+
+    
+
+
+
+<link rel="stylesheet" href="/css/github.css">
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.9181f25ed2263aeb878ec6f8a84f10c4ebb16150000fca8767308880bdde5ca0.css" integrity="sha256-kYHyXtImOuuHjsb4qE8QxOuxYVAAD8qHZzCIgL3eXKA=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://chafou.in/">Chafouin</a>
+      </span>
+      
+        
+        
+        
+        <div class="author-image">
+          <img src="https://chafou.in//img/logo.png" alt="Author Image" class="img--circle img--headshot element--center">
+        </div>
+        
+      
+      
+      <p class="site__description">
+          Cloud monkey Automation junky Fabulous SRE 
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Chafouin</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		 
+			 
+				<li>
+					<a href="/">
+						<span>Home</span>
+					</a>
+				</li>
+			 
+		 
+			 
+				<li>
+					<a href="/about/">
+						<span>About</span>
+					</a>
+				</li>
+			 
+		
+		</li>
+	</ul>
+</div>
+
+        <section class="social">
+	
+	
+	
+	<a href="https://github.com/chafouin" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/charpe-v" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	<a href="mailto:vincent@chafou.in" rel="me"><i class="fas fa-at fa-lg" aria-hidden="true"></i></a>
+	
+</section>
+
+      </div>
+    </div>
+    
+<div class="copyright">
+  &copy; 2019 chafouin
+  
+    <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>
+  
+</div>
+
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    <article>
+  <header>
+    <h1></h1>
+    
+    
+<div class="post__meta">
+    
+    
+    
+    
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 2 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    
+
+<p>go-html-template-css</p>
+
+<hr />
+
+<p>title: &ldquo;Golang HTML template &amp; CSS variable&rdquo;
+date: 2018-08-03T22:41:56+03:00</p>
+
+<h2 id="draft-true">draft: true</h2>
+
+<p>There is numerous resource to find out how to use HTML templating in Golang on the Internet. However I encounter on particular issue that I could resolv myself. The probleme is simple: when templating an HTML file in Golang, how can we replace a given template variable by a string containing some CSS. You can try it for yourself with the following snippet.</p>
+
+<p><snippet></p>
+
+<p>When you run the snippet, open a browser and inspect the page source code, you will not find your CSS but a string <em>&ldquo;ZgotmplZ&rdquo;</em>. Wierd isn&rsquo;t it ?</p>
+
+<p>First I tried to use the <em>template.HTML</em> type, which escape HTML but I does not work with CSS and return the same value. Google was not really helpful with that because searching for this issue, it returns a lot of article or guide explaning how to do HTML templating in Golang and sometime how to server static CSS file but nothing on CSS in template variable. Finally I found <a href="https://stackoverflow.com/questions/27906812/unescape-css-input-in-html">this answer</a> on Stack Overflow, that explain very well what is the issue and how to fix it. The rest of the article will paraphrase this excellent answer from <em>icza</em>.</p>
+
+<p><em>&ldquo;ZgotmplZ&rdquo;</em> is a special value that indicates that unsafe content reached a CSS or URL context at runtime. See [<a href="https://golang.org/pkg/html/template/#ErrorCode](">https://golang.org/pkg/html/template/#ErrorCode](</a>).</p>
+
+<p>Since the code we are trying to insert is in the context of CSS code and not HTML, it is considered as unsafe, so string type or template.HTML type will not work.
+There is a predefined type template.CSS for safe inclusion of CSS code coming from trusted source e.g. CSS code you specify and is not coming from an HTML form filled by the user.</p>
+
+<p>With this information in mind, here is a working snippet.</p>
+
+<p>The solution was pretty straighforward but quite difficult to figure out, hence this small article.</p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    <a href="/posts/kafka-cloudwatch-consumer-lag/" class="navigation-prev">
+      <i aria-hidden="true" class="fa fa-chevron-left"></i>
+      <span class="navigation-tittle"></span>
+    </a>
+    
+    
+    <a href="/posts/aws-asg-ddns/" class="navigation-next">
+      <span class="navigation-tittle"></span>
+      <i aria-hidden="true" class="fa fa-chevron-right"></i>
+    </a>
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+<script defer src="/js/fontawesome-5.6.3-all.min.js"></script>
+
+
+    
+    
+        <script src="/js/highlight.pack.js"></script>
+    
+    <script type="text/javascript">
+        
+        hljs.initHighlightingOnLoad();
+    </script>
+    
+
+
+
+
+    
+
+
+
+    </body>
+</html>

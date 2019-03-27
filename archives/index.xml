@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Archives on Chafouin</title>
+    <link>https://chafou.in/archives/</link>
+    <description>Recent content in Archives on Chafouin</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 12 Jan 2017 10:45:25 +0300</lastBuildDate>
+    
+	<atom:link href="https://chafou.in/archives/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Monitoring: from Sensu to Elastic Stack</title>
+      <link>https://chafou.in/archives/sensu-elk/</link>
+      <pubDate>Thu, 12 Jan 2017 10:45:25 +0300</pubDate>
+      
+      <guid>https://chafou.in/archives/sensu-elk/</guid>
+      <description>Few months ago, I wrote an article for the company I work for about Sensu and how to collect metrics and forward them into ElasticSearch. This is only a PoC but I think it can be useful, at least to understand how to setup Sensu and Logstash and how Sensu checks and handlers work.
+Of course there is better metrics gathering solution like TICK stack and so on but if you already have Sensu client deploy on your infrastructure and you don&amp;rsquo;t want to install another software like Collectd, Filebeat or Telegraf in order to send metrics into Graphana, InfluxDB or ElasticSearch.</description>
+    </item>
+    
+  </channel>
+</rss>

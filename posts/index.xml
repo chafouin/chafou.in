@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Chafouin</title>
+    <link>https://chafou.in/posts/</link>
+    <description>Recent content in Posts on Chafouin</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 03 Sep 2018 22:41:56 +0300</lastBuildDate>
+    
+	<atom:link href="https://chafou.in/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>AWS AutoScaling Group &amp; lifecycle hook</title>
+      <link>https://chafou.in/posts/aws-asg-lifecycle/</link>
+      <pubDate>Mon, 03 Sep 2018 22:41:56 +0300</pubDate>
+      
+      <guid>https://chafou.in/posts/aws-asg-lifecycle/</guid>
+      <description>AWS AutoScaling Group lifecycle management AutoScaling Service Amazon Web Services AutoScaling is a service that automatically adjust the capacity of a group of EC2 instancesd. It is possible to set a fixed number of instance or set rules so the group will scale according to a metric. An AutoScaling Group is a group of instance launched by the AutoScaling service on your behalf, using a Launch Configuration or a Launch Template.</description>
+    </item>
+    
+    <item>
+      <title>AWS AutoScaling Group &amp; dynamic Route53 records</title>
+      <link>https://chafou.in/posts/route53-manager/</link>
+      <pubDate>Mon, 14 May 2018 11:32:20 +0300</pubDate>
+      
+      <guid>https://chafou.in/posts/route53-manager/</guid>
+      <description>Dynamic DNS within an AutoScaling Group Problem When you are deploying your application on AWS, you might want to use an AutoScaling Group to launch your EC2 instances. It works relatively well, has a lot of feature such as auto healing, scalability according to metrics, load balancer integration, etc. Everything seems great with AutoScaling Group, except when you want to have a DNS record pointing on your instances. With a single EC2, it is possible to automatically add a Route53 record pointing to the instance with CloudFormation.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://chafou.in/posts/aws-asg-autoscaling-hook/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://chafou.in/posts/aws-asg-autoscaling-hook/</guid>
+      <description>aws-asg-autoscaling-hook
+title: &amp;ldquo;AWS AutoScaling Group &amp;amp; lifecycle hook&amp;rdquo; date: 2018-08-03T22:41:56+03:00
+draft: false AWS AutoScaling Group lifecycle management AutoScaling Service Amazon Web Services AutoScaling is a service that automatically adjust the capacity of instances based on the load. It is possible to set a fixed number of instance or set rules so the instance will scale according to a metric. An AutoScaling Group is a group of instance launched by the AutoScaling service on your behalf, according to a Launch Configuration or a Launch Template.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://chafou.in/posts/aws-asg-ddns/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://chafou.in/posts/aws-asg-ddns/</guid>
+      <description>aws-asg-ddns
+title: &amp;ldquo;AWS AutoScaling Group &amp;amp; dynamic Route53 records&amp;rdquo; date: 2018-05-14T11:32:20+03:00
+draft: false Dynamic DNS for AWS AutoScaling Group AutoScaling group and Route53 record When you are deploying your application on AWS, you might want to use an AutoScaling Group to launch your EC2 instances. It groups logically the instance and has a lot of feature such as auto healing, scalability according to metrics, load balancer integration, etc. A good ptractice is to always run your instance in such group.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://chafou.in/posts/go-html-template-css/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://chafou.in/posts/go-html-template-css/</guid>
+      <description>go-html-template-css
+title: &amp;ldquo;Golang HTML template &amp;amp; CSS variable&amp;rdquo; date: 2018-08-03T22:41:56+03:00
+draft: true There is numerous resource to find out how to use HTML templating in Golang on the Internet. However I encounter on particular issue that I could resolv myself. The probleme is simple: when templating an HTML file in Golang, how can we replace a given template variable by a string containing some CSS. You can try it for yourself with the following snippet.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://chafou.in/posts/kafka-cloudwatch-consumer-lag/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://chafou.in/posts/kafka-cloudwatch-consumer-lag/</guid>
+      <description>kafka-cloudwatch-consumer-lag
+title: &amp;ldquo;Kafka consumer lag monitoring &amp;amp; CloudWatch&amp;rdquo; date: 2019-02-15T16:10:42+03:00
+draft: true Kafka is a distributed message streaming platform and one of the Apache projects. It can be use for numerous tasks: processing queue, messaging system, storage, etc. It can be use to build real-time processing system. It is horizontally scalable, fault-tolerant and quite fast.
+Amazon has its own implementation streaming platform similar to Kafka called Kinesis. TODO: Kinesis description</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://chafou.in/posts/kvm-ddns/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://chafou.in/posts/kvm-ddns/</guid>
+      <description>kvm-ddns
+title: &amp;ldquo;KVM &amp;amp; Dynamic DNS: dynamic virtual machine naming&amp;rdquo; date: 2017-06-10T15:32:15+03:00
+draft: false In my previous article, we saw how to provision KVM virtual machine with PXE. We have our own virtual machine deployment lab in our own laptop. And that&amp;rsquo;s great. Each time we create a virtual machine, we need to connect with Spice in order to get the private IP or use tool like nmap or check the ARP cache.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://chafou.in/posts/kvm-pxe/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://chafou.in/posts/kvm-pxe/</guid>
+      <description>kvm-pxe
+title: &amp;ldquo;KVM &amp;amp; PXE: virtual machine setup automation&amp;rdquo; date: 2016-10-27T19:55:05+03:00
+draft: false What is virtualization ? Since the 1960s and mainframe computers, computer scientists have made huge progress on virtualization. However until late 1990s, this was out of fashion. Popek and Goldberg defined it as &amp;ldquo;an efficient and isolated duplicate of a real machine&amp;rdquo;. Nowadays, even if some are still reluctant to the idea, virtual machines are present everywhere in the IT world.</description>
+    </item>
+    
+  </channel>
+</rss>

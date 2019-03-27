@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.48" />
+
+    
+    
+    
+
+<title> • Chafouin</title>
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="aws-asg-autoscaling-hook
+title: &ldquo;AWS AutoScaling Group &amp; lifecycle hook&rdquo; date: 2018-08-03T22:41:56&#43;03:00
+draft: false AWS AutoScaling Group lifecycle management AutoScaling Service Amazon Web Services AutoScaling is a service that automatically adjust the capacity of instances based on the load. It is possible to set a fixed number of instance or set rules so the instance will scale according to a metric. An AutoScaling Group is a group of instance launched by the AutoScaling service on your behalf, according to a Launch Configuration or a Launch Template."/>
+
+<meta property="og:title" content="" />
+<meta property="og:description" content="aws-asg-autoscaling-hook
+title: &ldquo;AWS AutoScaling Group &amp; lifecycle hook&rdquo; date: 2018-08-03T22:41:56&#43;03:00
+draft: false AWS AutoScaling Group lifecycle management AutoScaling Service Amazon Web Services AutoScaling is a service that automatically adjust the capacity of instances based on the load. It is possible to set a fixed number of instance or set rules so the instance will scale according to a metric. An AutoScaling Group is a group of instance launched by the AutoScaling service on your behalf, according to a Launch Configuration or a Launch Template." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://chafou.in/posts/aws-asg-autoscaling-hook/" />
+
+    
+
+
+
+<link rel="stylesheet" href="/css/github.css">
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.9181f25ed2263aeb878ec6f8a84f10c4ebb16150000fca8767308880bdde5ca0.css" integrity="sha256-kYHyXtImOuuHjsb4qE8QxOuxYVAAD8qHZzCIgL3eXKA=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://chafou.in/">Chafouin</a>
+      </span>
+      
+        
+        
+        
+        <div class="author-image">
+          <img src="https://chafou.in//img/logo.png" alt="Author Image" class="img--circle img--headshot element--center">
+        </div>
+        
+      
+      
+      <p class="site__description">
+          Cloud monkey Automation junky Fabulous SRE 
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Chafouin</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		 
+			 
+				<li>
+					<a href="/">
+						<span>Home</span>
+					</a>
+				</li>
+			 
+		 
+			 
+				<li>
+					<a href="/about/">
+						<span>About</span>
+					</a>
+				</li>
+			 
+		
+		</li>
+	</ul>
+</div>
+
+        <section class="social">
+	
+	
+	
+	<a href="https://github.com/chafouin" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/charpe-v" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	<a href="mailto:vincent@chafou.in" rel="me"><i class="fas fa-at fa-lg" aria-hidden="true"></i></a>
+	
+</section>
+
+      </div>
+    </div>
+    
+<div class="copyright">
+  &copy; 2019 chafouin
+  
+    <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>
+  
+</div>
+
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    <article>
+  <header>
+    <h1></h1>
+    
+    
+<div class="post__meta">
+    
+    
+    
+    
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 5 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    
+
+<p>aws-asg-autoscaling-hook</p>
+
+<hr />
+
+<p>title: &ldquo;AWS AutoScaling Group &amp; lifecycle hook&rdquo;
+date: 2018-08-03T22:41:56+03:00</p>
+
+<h2 id="draft-false">draft: false</h2>
+
+<h1 id="aws-autoscaling-group-lifecycle-management">AWS AutoScaling Group lifecycle management</h1>
+
+<h2 id="autoscaling-service">AutoScaling Service</h2>
+
+<p><em>Amazon Web Services AutoScaling</em> is a service that automatically adjust the
+capacity of instances based on the load. It is possible to set a fixed number of
+instance or set rules so the instance will scale according to a metric. An
+AutoScaling Group is a group of instance launched by the AutoScaling service on
+your behalf, according to a Launch Configuration or a Launch Template. A good
+practice is to use AutoScaling for any instance that you run on AWS. The reason
+is because of the integrated autoheal based on system healthcheck. Without ASG,
+if something happend to an instance, it will not be recreated automatically.
+AutoScaling has a lot of advantages: reduces costs by diminushing the capacity
+in case of low usage, autohealing in case of the sudden loos of an instance,
+scheduled scaling, scaling based on metrics, aggregated monitoring, easy
+integration with Elastic Load Balancer, etc.</p>
+
+<h2 id="lifecycle-hooks">Lifecycle hooks</h2>
+
+<p>The main function of the service is to scale up and down a pool of instance.
+When it scales down because one instance is not needed anymore, it will
+terminate it. The termination is not graceful, so if you use the instance for
+processing, some task might still be running, thus it is possible to loose data.
+Another nice feature of AutoScaling to answer to this problem is the <em>lifecycle
+hooks</em>. Those hooks can be setup to be set on instance creation or termination.
+If a hook is set, AutoScaling will pause the creation or termination process and
+will wait for a signal to continue. The idea is that you can let the instance
+finish its tasks, then send the signal to the AutoScaling and the instance will
+be deleted without any loss. Neat. But Amazon does not provide anything out of
+the box on an instance to detect that a hook is set or to send a signal
+afterward. The AWS CLI or SDK provide such mecanism. In this article, I will
+present a simple solution to handle the lifecycle hook directly on the targeted
+EC2 instance to gracefuly shut it down.</p>
+
+<h2 id="lifecycle-hook-manager">Lifecycle hook manager</h2>
+
+<p>The idea is very simple: a Python script will run on regular basis thanks to a
+cron job, it will check if a hook has been set by the AutoScaling on the
+instance. If so, it runs a given command then send the signal to the AutoScaling
+Group to proceed. I called the script the lifecycle hook handler.</p>
+
+<p>The code can be found on <a href="https://github.com/chafouin/aws-asg-lifecycle-hook-handler">GitHub</a>.</p>
+
+<h2 id="usage-on-ec2-instance">Usage on EC2 instance</h2>
+
+<p>In this example, the lifecycle hook manager is just sending a message to all tty
+but it cans run any shell command. This example requires an AWS account with a
+VPC setup and an AutoScaling Group with one instance running SSH access.</p>
+
+<p>The instance needs to have a IAM role with at least the following policy attached :</p>
+
+<pre><code>{
+    &quot;Version&quot;: &quot;2012-10-17&quot;,
+    &quot;Statement&quot;: [
+        {
+            &quot;Action&quot;: [
+                &quot;autoscaling:CompleteLifecycleAction&quot;,
+                &quot;autoscaling:DescribeAutoScalingInstances&quot;,
+                &quot;autoscaling:DescribeLifecycleHooks&quot;,
+                &quot;autoscaling:RecordLifecycleActionHeartbeat&quot;
+            ],
+            &quot;Resource&quot;: &quot;*&quot;,
+            &quot;Effect&quot;: &quot;Allow&quot;
+        }
+    ]
+}
+</code></pre>
+
+<p>The following command will add a lifecycle hook on termination to the existing ASG:</p>
+
+<pre><code>aws autoscaling put-lifecycle-hook --lifecycle-hook-name test-hook --auto-scaling-group-name &lt;asg_name&gt; --lifecycle-transition autoscaling:EC2_INSTANCE_TERMINATING
+</code></pre>
+
+<p>You can check that the lifecycle hook has been created with:</p>
+
+<pre><code>aws autoscaling describe-lifecycle-hooks --auto-scaling-group-name &lt;asg_name&gt;
+</code></pre>
+
+<p>Then you can use SSH to connect to the EC2 instance, get the hook manger script there and run the following command:</p>
+
+<pre><code>./lifecycle_hook_handler.py -c 'wall &quot;Instance is being terminated&quot;'
+</code></pre>
+
+<p>The <em>-c</em> parameter is use to specify the command that should be run if the hook is set.
+Nothing should happens because the lifecycle hook is not set yet.</p>
+
+<p>You can then terminate the instance on the AWS Console but don&rsquo;t terminate the instance
+manually otherwise it will be terminated without hook. Instead, set the desired
+instance number in the AutoScaling Group from 1 to 0.</p>
+
+<p>You can then run the hook manager script again :</p>
+
+<pre><code>./lifecycle_hook_handler.py -c 'sleep 30 &amp;&amp; wall &quot;Instance is being terminated&quot;'
+</code></pre>
+
+<p>And this time, the hook should be set so the command should run and the signal should be sent back to the AutoScaling Group. While the command is running, the manager will send an heartbeat every 10 seconds by default, otherwise the AutoScaling will timeout the hook. The script itself will timeout after 5 minutes by default, you can set this value using the <em>-s</em> parameter. The AutoScaling group will timeout automatically the lifecycle hook after 48 hours, so the value should be inferior (see global timeout in the the <em>desribe-lifecycle-hooks</em> command). After a timeout, the default action set when you created the lifecycle hook will be executed, it can be abort or continue the termination or the creation, you can use <em>-a</em> parameter to set the value.</p>
+
+<p>You can use <em>-l</em> and <em>-g</em> parameter to setrespectively the lifecycle hook name or the AutoScaling Group name, it can be useful if you don&rsquo;t want to run the manager on the instance itself. If you don&rsquo;t specify those parameters, the manager will auto detect them for you. The <em>-r</em> parameter can be use to specify the region where the instance is located.</p>
+
+<p>In the repository, there is an example of cron job that can reproduce the same example,
+the job will check the hook status every 5 minutes and run the same command if a hook is set.</p>
+
+<p>Since the code is open-source, you can freely use this manager to handle the
+lifecycle hooks on your EC2 instances. Don&rsquo;t hesitate to report or propose improvement idea with an GitHub issue or even open a pull request if you want to contribute.
+request.</p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    <a href="/posts/aws-asg-ddns/" class="navigation-prev">
+      <i aria-hidden="true" class="fa fa-chevron-left"></i>
+      <span class="navigation-tittle"></span>
+    </a>
+    
+    
+    <a href="/posts/route53-manager/" class="navigation-next">
+      <span class="navigation-tittle">AWS AutoScaling Group &amp; dynamic Route53 records</span>
+      <i aria-hidden="true" class="fa fa-chevron-right"></i>
+    </a>
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+<script defer src="/js/fontawesome-5.6.3-all.min.js"></script>
+
+
+    
+    
+        <script src="/js/highlight.pack.js"></script>
+    
+    <script type="text/javascript">
+        
+        hljs.initHighlightingOnLoad();
+    </script>
+    
+
+
+
+
+    
+
+
+
+    </body>
+</html>

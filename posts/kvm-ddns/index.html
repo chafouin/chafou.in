@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+    
+
+
+    <head>
+    
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="public" />
+<!-- Enable responsiveness on mobile devices -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.48" />
+
+    
+    
+    
+
+<title> • Chafouin</title>
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="kvm-ddns
+title: &ldquo;KVM &amp; Dynamic DNS: dynamic virtual machine naming&rdquo; date: 2017-06-10T15:32:15&#43;03:00
+draft: false In my previous article, we saw how to provision KVM virtual machine with PXE. We have our own virtual machine deployment lab in our own laptop. And that&rsquo;s great. Each time we create a virtual machine, we need to connect with Spice in order to get the private IP or use tool like nmap or check the ARP cache."/>
+
+<meta property="og:title" content="" />
+<meta property="og:description" content="kvm-ddns
+title: &ldquo;KVM &amp; Dynamic DNS: dynamic virtual machine naming&rdquo; date: 2017-06-10T15:32:15&#43;03:00
+draft: false In my previous article, we saw how to provision KVM virtual machine with PXE. We have our own virtual machine deployment lab in our own laptop. And that&rsquo;s great. Each time we create a virtual machine, we need to connect with Spice in order to get the private IP or use tool like nmap or check the ARP cache." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://chafou.in/posts/kvm-ddns/" />
+
+    
+
+
+
+<link rel="stylesheet" href="/css/github.css">
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/scss/hyde-hyde.9181f25ed2263aeb878ec6f8a84f10c4ebb16150000fca8767308880bdde5ca0.css" integrity="sha256-kYHyXtImOuuHjsb4qE8QxOuxYVAAD8qHZzCIgL3eXKA=">
+
+
+<link rel="stylesheet" href="/scss/print.2744dcbf8a0b2e74f8a50e4b34e5f441be7cf93cc7de27029121c6a09f9e77bc.css" integrity="sha256-J0Tcv4oLLnT4pQ5LNOX0Qb58&#43;TzH3icCkSHGoJ&#43;ed7w=" media="print">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+
+</head>
+
+
+    <body class=" ">
+    
+<div class="sidebar">
+  <div class="container ">
+    <div class="sidebar-about">
+      <span class="site__title">
+        <a href="https://chafou.in/">Chafouin</a>
+      </span>
+      
+        
+        
+        
+        <div class="author-image">
+          <img src="https://chafou.in//img/logo.png" alt="Author Image" class="img--circle img--headshot element--center">
+        </div>
+        
+      
+      
+      <p class="site__description">
+          Cloud monkey Automation junky Fabulous SRE 
+      </p>
+    </div>
+    <div class="collapsible-menu">
+      <input type="checkbox" id="menuToggle">
+      <label for="menuToggle">Chafouin</label>
+      <div class="menu-content">
+        <div>
+	<ul class="sidebar-nav">
+		 
+		 
+			 
+				<li>
+					<a href="/">
+						<span>Home</span>
+					</a>
+				</li>
+			 
+		 
+			 
+				<li>
+					<a href="/about/">
+						<span>About</span>
+					</a>
+				</li>
+			 
+		
+		</li>
+	</ul>
+</div>
+
+        <section class="social">
+	
+	
+	
+	<a href="https://github.com/chafouin" rel="me"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	<a href="https://linkedin.com/in/charpe-v" rel="me"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a>
+	
+	
+	
+	
+	
+	
+	
+	
+	<a href="mailto:vincent@chafou.in" rel="me"><i class="fas fa-at fa-lg" aria-hidden="true"></i></a>
+	
+</section>
+
+      </div>
+    </div>
+    
+<div class="copyright">
+  &copy; 2019 chafouin
+  
+    <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>
+  
+</div>
+
+
+
+  </div>
+</div>
+
+        <div class="content container">
+            
+    <article>
+  <header>
+    <h1></h1>
+    
+    
+<div class="post__meta">
+    
+    
+    
+    
+    
+    
+    <br/>
+    <i class="fas fa-clock"></i> 6 min read
+</div>
+
+
+  </header>
+  
+  
+  <div class="post">
+    
+
+<p>kvm-ddns</p>
+
+<hr />
+
+<p>title: &ldquo;KVM &amp; Dynamic DNS: dynamic virtual machine naming&rdquo;
+date: 2017-06-10T15:32:15+03:00</p>
+
+<h2 id="draft-false">draft: false</h2>
+
+<p>In my previous article, we saw how to provision KVM virtual machine with PXE. We have our own virtual machine deployment lab in our own laptop. And that&rsquo;s great. Each time we create a virtual machine, we need to connect with Spice in order to get the private IP or use tool like nmap or check the ARP cache. If you need to deploy a lot of virtual machine, this will become a real hassle.</p>
+
+<p>In this article, I will present you another solution for this problem : the dynamic DNS. We will install a DNS server on our hypervisor (here a laptop). This DNS server will register each virtual machine when it joins the network. Then, the virtual machine will get its hostname from the same DNS server. So you can decide what will be the machine name beforehand then deploy it and use this name to connect to it easily.</p>
+
+<p>While Dynamic DNS is not advise to be deploy in a production environment because of security issues it can provoke, it is very suitable for a personal laboratory on our own network.
+Stop talking, get ready for action.</p>
+
+<p>The DNS server we will use, on Debian or Ubuntu, is bind9.</p>
+
+<p><code>sudo apt install bind9</code></p>
+
+<p>First, we will edit the main configuration files /etc/bind/named.conf</p>
+
+<pre><code>acl internals { 127.0.0.0/8; 10.250.12.0/24; };
+
+controls {
+    inet 127.0.0.1 port 953 allow { 127.0.0.1; };
+};
+
+include &quot;/etc/bind/chafouin.org-rndc.key&quot;;
+
+include &quot;/etc/bind/named.conf.default-zones&quot;;
+include &quot;/etc/bind/named.conf.local&quot;;
+include &quot;/etc/bind/named.conf.options&quot;;
+</code></pre>
+
+<p>This is the main configuration file, it loads few others files we will edit later, the key use by DNSSEC and limit the control ACL to localhost.</p>
+
+<p>Then, in order to authenticate request coming from the DHCP to the DNS server, we will create a RDNC key. Let&rsquo;s generate it.</p>
+
+<p><code>dnssec-keygen -a HMAC-MD5 -b 512 -n USER chafouin.org-rndc</code></p>
+
+<p>It will create 2 files, one private and one key. Edit the file /etc/bind/chafouin.org-rndc.key and put the private key in it.</p>
+
+<pre><code>key &quot;chafouin.org-rndc.key&quot; {
+        algorithm hmac-md5;
+        secret &quot;&lt;secret_key&gt;&quot;;
+};
+</code></pre>
+
+<p>Remove world readable right.</p>
+
+<p><code>chmod 600 /etc/bind/chafouin.org-rndc.key</code></p>
+
+<p>Let&rsquo;s continue our bind configuration with /etc/bind/named.conf.options</p>
+
+<pre><code>options {
+	directory &quot;/var/cache/bind&quot;;
+
+	query-source address * port *;
+
+	forwarders {
+	    8.8.8.8;
+        8.8.4.4;
+	};
+
+	dnssec-validation auto;
+
+	auth-nxdomain no;
+    listen-on-v6 { none; };
+    listen-on { 127.0.0.1; 10.250.12.254; };
+
+    allow-transfer { none; };
+    allow-query { internals; };
+    allow-recursion { internals; };
+
+    version none;
+}
+</code></pre>
+
+<p>This file contains some bind server general configurations: the working directory, the authorize query sources, the DNS server where unknown domain requests will be forwarded, if DNSSEC is enabled or not, the interfaces where the server will listen, who is allowed to send AXFR transfert, domain request and recursive queries. You should read the <a href="http://www.bind9.net/arm910.pdf">bind manual</a> for more informations.</p>
+
+<p>Now, let&rsquo;s edit /etc/bind/named.conf.local. This is where you will create your DNS zone and allow the DHCP to update the DNS list.</p>
+
+<pre><code>zone &quot;chafouin.org&quot; {
+        type master;
+        file &quot;/var/cache/bind/db.chafouin.org&quot;;
+        forwarders {};
+	    notify no;
+        allow-update { key chafouin.org-rndc.key; };
+	    allow-query { any; };
+};
+zone &quot;12.250.10.in-addr.arpa&quot; {
+        type master;
+        file &quot;/var/cache/bind/db.chafouin.org.inv&quot;;
+        forwarders {};
+	    notify no;
+        allow-update { key chafouin.org-rndc.key; };
+	    allow-query { any; };
+};
+
+include &quot;/etc/bind/zones.rfc1918&quot;;
+</code></pre>
+
+<p>Then, we will create our two DNS zone files, one for DNS resolution and the other one for reverse DNS resolution.</p>
+
+<p>Edit /etc/bind/db.chafouin.org. This file contains the DNS rules, it will be updated on-the-fly by the dynamic DNS system.</p>
+
+<pre><code>$TTL    3600
+@       IN      SOA     chafouin.org. chafouin.org. (
+                     2017052701         ; Serial
+                           3600         ; Refresh
+                            600         ; Retry
+                          86400         ; Expire
+                           3600 )       ; Negative Cache TTL
+;
+@       IN      NS      ns.chafouin.org.
+ns      IN      A       10.250.12.254
+</code></pre>
+
+<p>And /etc/bind/db.chafouin.org.inv. Same principle but for reverse DNS rules.</p>
+
+<pre><code>$TTL    3600
+@       IN      SOA     chafouin.org. root.chafouin.org. (
+                     2017052701         ; Serial
+                           3600         ; Refresh
+                            600         ; Retry
+                          86400         ; Expire
+                           3600 )       ; Negative Cache TTL
+
+@               IN      NS      ns.chafouin.org.
+1               IN      PTR     ns.chafouin.org.
+</code></pre>
+
+<p>Then link the file to the right place.</p>
+
+<p><code>ln -s /etc/bind/db.chafouin.org /var/cache/bind/</code></p>
+
+<p><code>ln -s /etc/bind/db.chafouin.org.inv /var/cache/bind/</code></p>
+
+<p>The DNS server is ready, we must apply some changes in the DHCP configuration.</p>
+
+<pre><code>option domain-name &quot;chafouin.org&quot;;
+option domain-name-servers 127.0.0.1;
+
+default-lease-time 600;
+max-lease-time 3600;
+server-name &quot;chafouin-dhcp-server&quot;;
+
+ddns-updates           on;
+ddns-update-style      interim;
+ignore                 client-updates;
+update-static-leases   on;
+
+authoritative;
+
+allow bootp;
+allow booting;
+
+include &quot;/etc/dhcp/chafouin.org-rndc.key&quot;;
+
+zone chafouin.org. {
+  primary 127.0.0.1;
+  key chafouin.org-rndc.key;
+}
+
+zone 12.250.10.in-addr.arpa. {
+  primary 127.0.0.1;
+  key chafouin.org-rndc.key;
+}
+
+subnet 10.250.12.0 netmask 255.255.255.0 {
+  range 10.250.12.100 10.250.12.200;
+  option subnet-mask 255.255.255.0;
+  option broadcast-address 10.250.12.255;
+  option routers 10.250.12.254;
+  option domain-name-servers 10.250.12.254;
+  ping-check = 1;
+  filename &quot;pxelinux.0&quot;;
+  next-server 10.250.12.254;
+}
+</code></pre>
+
+<p>This file is quite the same as the previous article about PXE boot, we just made few modifications in order to add dynamic DNS. This is DHCP server that will update the DNS rules files each time a new virutal machine is joining the network.</p>
+
+<p>You are now all set. You can try to launch a virtual machine, when the setup is complete, the machine will restart and its DNS name will be added to the DNS server. Here the DNS entry will look like <code>&lt;machine_hostname&gt;.chafouin.org</code>.</p>
+
+<p>When a virtual machine is provisionned by the PXE, the preseed file set the machine hostname to debian. If we start 2 virtual machines in the same time, both will try to add the same entry in the DNS server. How can we choose our machine name then ?</p>
+
+<p>My workaround is simple : we will use the TFTP server and the last_command field in the preseed configuration in order to get and set the hostname at the end of the installation. When the machine will reboot, it will have a new hostname, without conflict.</p>
+
+<p>Create a new folder in the TFTP path :</p>
+
+<p><code>mkdir /srv/tftp/hostnames</code></p>
+
+<p>This folder will contains one file per VM, named by the VM MAC address. It will contains its hostname.</p>
+
+<p>Let&rsquo;s change the preseed configuration to make the installer get the hostname corresponding to the machine. Edit the following line in the /srv/tftp/config/debian/debian-jessie-preseed.cfg</p>
+
+<pre><code>d-i preseed/late_command string chroot /target sh -c 'sed -i &quot;s/PermitRootLogin without-password/PermitRootLogin yes/g&quot; /etc/ssh/sshd_config; /usr/bin/curl -s tftp://10.250.12.254/hostnames/$(ip a s eth0 | grep link/ether | cut -d &quot; &quot; -f6) &gt; /etc/hostname; sed -i &quot;s/127.0.1.1\\tdebian/127.0.1.1\\t$(/usr/bin/curl -s tftp://10.250.12.254/hostnames/$(ip a s eth0 | grep link/ether | cut -d &quot; &quot; -f6))/g&quot; /etc/hosts'
+</code></pre>
+
+<p>Now, each time we will create a virtual machine, we will get its MAC address with virsh and we will add the hostname we want in a file named by its corresponding MAC address before the installation end and it will do the trick !</p>
+
+<p><code>echo 'labtest' &gt; /srv/tftp/hostnames/$(virsh domiflist &lt;machine_name&gt; | grep br0 | cut -d ' ' -f30)</code></p>
+
+<p>We now have a functional dynamic DNS in our KVM setup, we can now easily setup our virtual machine with a minimum manipulation. Create your xml template, create your virtual machine, launch it, select the right OS in the PXE menu then run the command to set the hostname, wait few minutes and you have a brand new virtual machine ready to be used, just connect to it using its domain name and you are good.</p>
+
+<p>References</p>
+
+<p><a href="https://wiki.debian.org/Bind9">https://wiki.debian.org/Bind9</a>
+<a href="https://wiki.debian.org/DDNS">https://wiki.debian.org/DDNS</a></p>
+
+  </div>
+  
+
+<div class="navigation navigation-single">
+    
+    <a href="/posts/kvm-pxe/" class="navigation-prev">
+      <i aria-hidden="true" class="fa fa-chevron-left"></i>
+      <span class="navigation-tittle"></span>
+    </a>
+    
+    
+    <a href="/posts/kafka-cloudwatch-consumer-lag/" class="navigation-next">
+      <span class="navigation-tittle"></span>
+      <i aria-hidden="true" class="fa fa-chevron-right"></i>
+    </a>
+    
+</div>
+
+
+  
+
+  
+    
+
+
+</article>
+
+
+        </div>
+        
+    
+
+<script defer src="/js/fontawesome-5.6.3-all.min.js"></script>
+
+
+    
+    
+        <script src="/js/highlight.pack.js"></script>
+    
+    <script type="text/javascript">
+        
+        hljs.initHighlightingOnLoad();
+    </script>
+    
+
+
+
+
+    
+
+
+
+    </body>
+</html>
